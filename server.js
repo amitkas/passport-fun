@@ -2,6 +2,8 @@ var express = require('express');
 var app = express();
 var passport = require('passport');
 var bodyParser = require('body-parser');
+var LocalStrategy = require('passport-local').Strategy;
+
 
 app.use(express.static('public'));
 app.use(express.static('node_modules'));
@@ -17,6 +19,19 @@ app.get('/success', function(req, res) {
 app.get('/login', function(req, res) {
   res.sendFile(__dirname + '/public/login.html');
 });
+app.post('/login', passport.authenticate('local', {
+  successRedirect: '/success',
+  failureRedirect: '/login',
+  session: false
+}));
+
+passport.use(new LocalStrategy(function(username, password, done) {
+  if ((username === "john") && (password === "password")) {
+    return done(null, { username: username, id: 1 });
+  } else {
+    return done(null, false);
+  }
+}));
 
 
 app.listen(8000, function() {
